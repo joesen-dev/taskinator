@@ -1,6 +1,7 @@
 var taskIdCounter = 0;
 var formEl = document.querySelector("#task-form");
 var tasksToDoEl = document.querySelector("#tasks-to-do");
+var pageContentEl = document.querySelector("#page-content");
 
 var taskFormHandler = function(event) {
   event.preventDefault();
@@ -95,3 +96,61 @@ var createTaskActions = function(taskId) {
 };
 
 formEl.addEventListener("submit", taskFormHandler);
+
+var taskButtonHandler = function(event) {
+   // get target element from event
+   var targetEl = event.target;
+
+   // edit button was clicked
+   if (targetEl.matches(".edit-btn")) {
+     var taskId = targetEl.getAttribute("data-task-id");
+     editTask(taskId);
+   } 
+
+   // delete button was clicked
+   else if (targetEl.matches(".delete-btn")) {
+     var taskId = targetEl.getAttribute("data-task-id");
+     deleteTask(taskId);
+   }
+  // // console-logging event.target reports the element on which the event occurs, in this case, the click event
+  // console.log(event.target);
+};
+
+// Add an Edit Task Function
+var editTask = function(taskId) {
+  // get task list item element
+  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+
+  // taskSelected.querySelector() vs. document.querySelector()
+    // document.querySelector() searches within the document element, which is the entire page
+    // taskSelected.querySelector() only searches within the taskSelected element.
+  // get content from task name and type
+  var taskName = taskSelected.querySelector("h3.task-name").textContent;
+  console.log(taskName);
+
+  var taskType = taskSelected.querySelector("span.task-type").textContent;
+
+  //  add the task's name and type to the form
+  document.querySelector("input[name='task-name']").value = taskName;
+  document.querySelector("select[name='task-type']").value = taskType;
+
+  // UI improvement for the user: "Add Task" button changes to "Save Task" to indicate that the form is in edit mode
+  document.querySelector("#save-task").textContent = "Save Task";
+  // add the taskId to a data-task-id attribute on the form itself for use to save the correct task
+  formEl.setAttribute("data-task-id", taskId);
+
+  
+};
+
+// Add a Delete Task Function
+var deleteTask = function(taskId) {
+  // BREAK DOWN OF var taskSelected 
+    // 1. select a list item using .task-item 
+    // 2. further narrow search by looking for a .task-item that has a data-task-id equal to the argument we've passed into the function
+    // NOTE: there's no space between the .task-item and the [data-task-id] attribute
+      // this means that both properties must be on the same element; a space would look for a element with the [data-task-id] attribute somewhere inside a .task-item element.
+  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+  taskSelected.remove();
+};
+
+pageContentEl.addEventListener("click", taskButtonHandler);
