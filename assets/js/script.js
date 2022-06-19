@@ -1,7 +1,10 @@
 var taskIdCounter = 0;
 var formEl = document.querySelector("#task-form");
 var tasksToDoEl = document.querySelector("#tasks-to-do");
+var tasksInProgressEl = document.querySelector("#tasks-in-progress");
+var tasksCompletedEl = document.querySelector("#tasks-completed");
 var pageContentEl = document.querySelector("#page-content");
+
 
 var taskFormHandler = function(event) {
   event.preventDefault();
@@ -16,15 +19,25 @@ var taskFormHandler = function(event) {
 
   formEl.reset();
   
-  // package up data as an object
-  var taskDataObj = {
+  var isEdit = formEl.hasAttribute("data-task-id");
+
+  // form has data attribute, so get task id and call function to complete edit process
+  if (isEdit) {
+    var taskId = formEl.getAttribute("data-task-id");
+    // call a new function, completeEditTask(), passing it three arguments: name input value, type input value, and task id
+    completeEditTask(taskNameInput, taskTypeInput, taskId);
+  } 
+  // no data attribute on form, so create object as normal and pass to createTaskEl function
+  else {
+    // package up data as an object
+    var taskDataObj = {
       name: taskNameInput,
       type: taskTypeInput
-  };
+    };
 
-  // send taskDataObj as an argument to createTaskEl
-  createTaskEl(taskDataObj);
-  
+    // send taskDataObj as an argument to createTaskEl
+    createTaskEl(taskDataObj);
+  } 
 };
 
 var createTaskEl = function (taskDataObj) {
@@ -95,8 +108,6 @@ var createTaskActions = function(taskId) {
   return actionContainerEl;
 };
 
-formEl.addEventListener("submit", taskFormHandler);
-
 var taskButtonHandler = function(event) {
    // get target element from event
    var targetEl = event.target;
@@ -137,9 +148,22 @@ var editTask = function(taskId) {
   // UI improvement for the user: "Add Task" button changes to "Save Task" to indicate that the form is in edit mode
   document.querySelector("#save-task").textContent = "Save Task";
   // add the taskId to a data-task-id attribute on the form itself for use to save the correct task
-  formEl.setAttribute("data-task-id", taskId);
+  formEl.setAttribute("data-task-id", taskId);  
+};
 
-  
+var completeEditTask = function(taskName, taskType, taskId) {
+  // find the matching task list item
+  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+
+  // set new values
+  taskSelected.querySelector("h3.task-name").textContent = taskName;
+  taskSelected.querySelector("span.task-type").textContent = taskType;
+
+  alert("Task Updated!");
+
+  // Reset form by removing the task id and changing the button text back to normal
+  formEl.removeAttribute("data-task-id");
+  document.querySelector("#save-task").textContent = "Add Task";
 };
 
 // Add a Delete Task Function
@@ -153,4 +177,32 @@ var deleteTask = function(taskId) {
   taskSelected.remove();
 };
 
+var taskStatusChangeHandler = function(event) {
+  // get the task item's id
+  var taskId = event.target.getAttribute("data-task-id");
+
+  // get the currently selected option's value and convert to lowercase
+  var statusValue = event.target.value.toLowerCase();
+
+  // find the parent task item element based on the id
+    // NOTE: the variable taskSelected didn't create a second <li>. That would only be the case if we used document.createElement(). 
+      // Instead, it's a reference to an existing DOM element, and we simply appended that existing element somewhere else.
+  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+  // console.log(event.target);
+  // console.log(event.target.getAttribute("data-task-id"));
+
+  if (statusValue === "to do") {
+    tasksToDoEl.appendChild(taskSelected);
+  } 
+  else if (statusValue === "in progress") {
+    tasksInProgressEl.appendChild(taskSelected);
+  } 
+  else if (statusValue === "completed") {
+    tasksCompletedEl.appendChild(taskSelected);
+  }
+
+};
+
+formEl.addEventListener("submit", taskFormHandler);
 pageContentEl.addEventListener("click", taskButtonHandler);
+pageContentEl.addEventListener("change", taskStatusChangeHandler);
