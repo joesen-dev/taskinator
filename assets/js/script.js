@@ -43,8 +43,7 @@ var taskFormHandler = function(event) {
 };
 
 var createTaskEl = function (taskDataObj) {
-  console.log(taskDataObj);
-  console.log(taskDataObj.status);
+
   // create list item
   var listItemEl = document.createElement("li");
   listItemEl.className = "task-item";
@@ -69,6 +68,8 @@ var createTaskEl = function (taskDataObj) {
   taskDataObj.id = taskIdCounter;
 
   tasks.push(taskDataObj);
+
+  saveTasks()
 
   // increase task counter for next unique id
   taskIdCounter++;
@@ -168,15 +169,15 @@ var completeEditTask = function(taskName, taskType, taskId) {
   taskSelected.querySelector("span.task-type").textContent = taskType;
 
   // loop through tasks array and task object with new content
-    // At each iteration of this for loop, we are checking to see if that individual task's id property matches the taskId argument that we passed into completeEditTask()
-  debugger;
+    // At each iteration of this for loop, we are checking to see if that individual task's id property matches the taskId argument that we passed into completeEditTask() 
   for (var i = 0; i < tasks.length; i++) {
     if (tasks[i].id === parseInt(taskId)) {
       tasks[i].name = taskName;
       tasks[i].type = taskType;
     }
   };
-  debugger;
+
+  saveTasks()
 
   alert("Task Updated!");
 
@@ -208,6 +209,7 @@ var deleteTask = function(taskId) {
 
   // reassign tasks array to be the same as updatedTaskArr
   tasks = updatedTaskArr;
+  saveTasks()
 };
 
 var taskStatusChangeHandler = function(event) {
@@ -240,9 +242,15 @@ var taskStatusChangeHandler = function(event) {
       tasks[i].status = statusValue;
     }
   }
-  console.log(tasks);
+  saveTasks()
 };
 
+// function to save tasks to localStorage
+var saveTasks = function() {
+  // NOTE:localStorage can only store one type of data: strings. It will convert any data sent into a string
+    // JSON.stringify is used to convert the tasks object into a JSON (JavaScript Object Notation) string
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 formEl.addEventListener("submit", taskFormHandler);
 pageContentEl.addEventListener("click", taskButtonHandler);
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
