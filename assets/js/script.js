@@ -194,6 +194,20 @@ var deleteTask = function(taskId) {
       // this means that both properties must be on the same element; a space would look for a element with the [data-task-id] attribute somewhere inside a .task-item element.
   var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
   taskSelected.remove();
+
+  // create new array to hold updated list of tasks
+  var updatedTaskArr = [];
+
+  // loop through current tasks
+  for (var i = 0; i < tasks.length; i++) {
+    // if tasks[i].id doesn't match the value of taskId (does not have the same id value as the task we want to delete), let's keep that task and push it into the new array
+    if (tasks[i].id !== parseInt(taskId)) {
+      updatedTaskArr.push(tasks[i]);
+    }
+  }
+
+  // reassign tasks array to be the same as updatedTaskArr
+  tasks = updatedTaskArr;
 };
 
 var taskStatusChangeHandler = function(event) {
