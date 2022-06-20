@@ -245,12 +245,106 @@ var taskStatusChangeHandler = function(event) {
   saveTasks()
 };
 
-// function to save tasks to localStorage
+// function to SAVE tasks to localStorage
 var saveTasks = function() {
   // NOTE:localStorage can only store one type of data: strings. It will convert any data sent into a string
     // JSON.stringify is used to convert the tasks object into a JSON (JavaScript Object Notation) string
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
+// function to LOAD tasks to localStorage
+  // 1. Gets task items from localStorage.
+
+  // 2 .Converts tasks from the string format back into an array of objects.
+
+  // 3. Iterates through a tasks array and creates task elements on the page from it.
+var loadTasks = function() {
+  // reassign tasks array to current localStorage
+  var tasks = localStorage.getItem("tasks");
+  console.log(tasks);
+
+  // 1. Check if tasks is equal to null by using an if statement.
+  if (tasks === null) {
+      // 2. If it is, set tasks back to an empty array by reassigning it to [] and adding a return false. We don't want this function to keep running with no tasks to load onto the page.
+    var tasks = [];
+    return false    
+  }
+
+  // JSON.parse turns covers localStorage strings into JSON objects
+  tasks = JSON.parse(tasks);
+  console.log(tasks);
+
+  // Create a for loop with a condition of i < tasks.length
+  for (var i = 0; i < tasks.length; i++) {
+    console.log(tasks[i]);
+    // 1. To keep the id for each task in sync, reassign the id property of task[i] to the value of taskIdCounter
+    var id = taskIdCounter
+    console.log(tasks[i].id);
+
+    // 3. Create a <li> element and store it in a variable called listItemEl.
+    var listItemEl = document.createElement("li");
+    // Give <li> element a classname attribute of task-item.
+    listItemEl.className = "task-item";
+    console.log(listItemEl)
+    // Using setAttribute(), give <li> element a data-task-id attribute with a value of tasks[i].id.
+    listItemEl.setAttribute("data-task-id", tasks[i].id);
+    console.log(listItemEl)
+
+    // 4. Create a <div> element and store it in a variable called taskInfoEl
+    var taskInfoEl = document.createElement("div");
+    // Give it a classname property of task-info to set the HTML class attribute.
+    taskInfoEl.className = "task.info"
+    console.log(taskInfoEl)
+    // Set its innerHTML property
+    taskInfoEl.innerHTML = "<h3 class='task-name'>" + tasks[i].name + "</h3><span class='task-type'>" + tasks[i].type + "</span>";
+    console.log(taskInfoEl)
+
+    // 5. Append taskInfoEl to listItemEl.
+    listItemEl.appendChild(taskInfoEl);
+
+    // 6. Create the actions for the task by creating a variable called taskActionsEl and giving it a value of createTaskActions() with tasks[i].id as the argument.
+    var taskActionsEl = createTaskActions(tasks[i].id); 
+
+    // 7. Append taskActionsEl to listItemEl.
+    listItemEl.appendChild(taskActionsEl);
+    console.log(listItemEl);
+
+    // 8. With an if statement, check if the value of tasks[i].status is equal to to do.
+    if (tasks[i].status === "to do") {
+      // If yes, use listItemEl.querySelector("select[name='status-change']").selectedIndex and set it equal to 0.
+      listItemEl.querySelector("select[name='status-change']").selectedIndex
+      tasks[i].status = "0"
+      console.log(tasks[i].status)
+      // Append listItemEl to tasksToDoEl.
+      tasksToDoEl.appendChild(listItemEl);
+      console.log(tasksToDoEl);
+    }
+    // 9. else if, check if the value of tasks[i].status is equal to in progress.
+    else if (tasks[i].status === "in progress") {
+      // If yes, use listItemEl.querySelector("select[name='status-change']").selectedIndex and set it equal to 1.
+      listItemEl.querySelector("select[name='status-change']").selectedIndex
+      tasks[i].status = "1"
+      console.log(tasks[i].status)
+      // Append listItemEl to tasksInProgressEl.
+      tasksInProgressEl.appendChild(listItemEl);
+      console.log(tasksInProgressEl);
+    }
+    // 10. else if, check if the value of tasks[i].status is equal to complete.
+    else if (tasks[i].status === "complete") {
+      // If yes, use listItemEl.querySelector("select[name='status-change']").selectedIndex and set it equal to 2.
+      listItemEl.querySelector("select[name='status-change']").selectedIndex
+      tasks[i].status = "2"
+      console.log(tasks[i].status)
+      // Append listItemEl to tasksCompletedEl.
+      tasksCompletedEl.appendChild(listItemEl);
+      console.log(tasksCompletedEl);
+    }
+    // 11. Increase taskIdCounter by 1.
+    taskIdCounter++;
+    console.log(listItemEl);    
+  }
+
+}
 formEl.addEventListener("submit", taskFormHandler);
 pageContentEl.addEventListener("click", taskButtonHandler);
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
+loadTasks();
